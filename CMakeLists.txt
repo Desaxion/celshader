@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.23.1)
 
-project(StarDwarves)
+project(CelShader)
 
 file(GLOB_RECURSE SOURCE_FILES 
 	${CMAKE_SOURCE_DIR}/src/*.c
