@@ -4,7 +4,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include "Camera.h"
-#include "Ship.h"
 
 #define MACOS false
 
@@ -31,8 +30,6 @@ float lastY = DEFAULT_HEIGHT / 2.0f;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-
-Ship ship;
 
 //Will resize the OpenGL viewport if the window is resized
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) { 
@@ -66,23 +63,6 @@ void processInput(GLFWwindow* window) {
 		camera.ProcessKeyboard(DOWN, deltaTime);
 	}
 
-	//move the ship
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		ship.manuvre(ship.RIGHT, deltaTime);
-	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		ship.manuvre(ship.LEFT, deltaTime);
-	}
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-		ship.manuvre(ship.UP, deltaTime);
-	}
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		ship.manuvre(ship.DOWN, deltaTime);
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) != GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT) != GLFW_PRESS && glfwGetKey(window, GLFW_KEY_UP) != GLFW_PRESS && glfwGetKey(window, GLFW_KEY_DOWN) != GLFW_PRESS) {
-		ship.pushReticleBack();
-	}
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)

@@ -3,10 +3,8 @@
 #include "Mesh.h"
 #include "Model.h"
 #include "Camera.h"
-#include "Ship.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "Meteorlevel.h"
 
 //Space texture image <a href="https://www.freepik.com/free-photo/milky-way-galaxy-night_13249998.htm#query=space&position=5&from_view=search&track=sph">Image by tawatchai07</a> on Freepik
 
@@ -29,7 +27,7 @@ int main() {
 	#endif
 
 	//Creating our window
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Star Dwarves", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "CelShading", NULL, NULL);
 	if (!window) { 
 		std::cout << "Failed to create window. " << std::endl;
 		glfwTerminate(); //Destroy everything related to window
@@ -45,15 +43,10 @@ int main() {
 
 
 	//We load in all of the different shaders here
-	////LOADING IN SHIP
-	Model shipModel("../assets/models/ship/ship.obj");
-	Shader shipShader("../src/shaders/ship.vs", "../src/shaders/ship.fs");
+	////LOADING IN MODEL
+	Model model("../assets/models/model.obj");
+	Shader shader("../src/shaders/ship.vs", "../src/shaders/ship.fs", "../src/shaders/geometry.gs");
 
-	Model skyBoxModel("../assets/models/skyBox/skyBoxModel.obj");
-	Shader skyBoxShader("../src/shaders/skyBox.vs", "../src/shaders/skyBox.fs");
-
-	Model reticleModel("../assets/models/reticle/reticlenew.obj");
-	Shader reticleShader("../src/shaders/reticle.vs", "../src/shaders/reticle.fs");
 
 	//Tell OpenGL first the position coordinates for lower left point of the viewport relative to the window, and then the size of the viewport
 	glViewport(0, 0, WIDTH, HEIGHT); //Position coordinates for lower left corner go from 0 to 1
@@ -114,11 +107,11 @@ int main() {
 	*/
 
 	//Game logic, selecting level and such
-	Level* selectedLevel;
-	Meteorlevel meteorlevel;
+	//Level* selectedLevel;
+	//Meteorlevel meteorlevel;
 
 	//Maybe create a button in the loop to check which level to be selected
-	selectedLevel = &meteorlevel; //At this moment, selecting the meteor level
+	//selectedLevel = &meteorlevel; //At this moment, selecting the meteor level
 
 
 	////////////    MAIN     RENDERING      LOOP    //////////////
@@ -143,65 +136,32 @@ int main() {
 		//glBindVertexArray(VAO);	//Specify upcoming objects to be rendered
 		//glDrawArrays(GL_TRIANGLES,0,3);//Draw the object! Second argument stands for index of starting vertex, last argument for amount of vertices to be drawn.
 
-		shipShader.use(); //Tell the render which shader to use for upcoming objects
+		shader.use(); //Tell the render which shader to use for upcoming objects
 		// view/projection transformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
 		glm::mat4 view = camera.GetViewMatrix();
 
-		glm::vec3 shipAngles = ship.shipAngles();
+		
 
 		float viewamount = 0.25f;
 
-		view = glm::rotate(view, -shipAngles.y*viewamount, glm::vec3(1.0f, 0.0f, 0.0f));
-		view = glm::rotate(view, shipAngles.x*viewamount, glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::rotate(view, viewamount, glm::vec3(1.0f, 0.0f, 0.0f));
+		view = glm::rotate(view, viewamount, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		float time = (float)glfwGetTime();
 
 
-		shipShader.setMat4("projection", projection);
-		shipShader.setMat4("view", view);
+		shader.setMat4("projection", projection);
+		shader.setMat4("view", view);
 
 
 
 		// render the loaded model
-	
-
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(ship.calculateShipPosition(deltaTime), 0.0f)); // translate it down so it's at the center of the scene
-		model = glm::rotate(model, shipAngles.y , glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, -shipAngles.x, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::rotate(model, shipAngles.z, glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(scale));	// it's a bit too big for our scene, so scale it down
-		shipShader.setMat4("model", model);
-
-
-
-		shipModel.Draw(shipShader);
-		
-		
-		skyBoxShader.use();
-
-
-		glm::mat4 skymodel = glm::mat4(1.0f);
-		skymodel = glm::translate(skymodel, glm::vec3(0.0f, 0.0f, 0.0f));
-		skyBoxShader.setMat4("projection", projection);
-		skyBoxShader.setMat4("skymodel", skymodel);
-		skyBoxShader.setMat4("view", view);
-		skyBoxModel.Draw(skyBoxShader);
-		
-
-		reticleShader.use();
-		glm::mat4 reticleTrans = glm::mat4(1.0f);
-		reticleTrans = glm::translate(reticleTrans, glm::vec3(ship.reticlePosition,-5.0f));
-		reticleShader.setMat4("reticleTrans", reticleTrans);
-		reticleShader.setMat4("projection", projection);
-		reticleShader.setMat4("view", view);
-		reticleModel.Draw(reticleShader);
-		//Process input
+		model.Draw(shader);
 
 		//Render Level
-		selectedLevel->generate();
-		selectedLevel->draw();
+		//selectedLevel->generate();
+		//selectedLevel->draw();
 
 		//Display title screen
 
