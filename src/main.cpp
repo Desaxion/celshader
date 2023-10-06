@@ -44,8 +44,8 @@ int main() {
 
 	//We load in all of the different shaders here
 	////LOADING IN MODEL
-	Model model("../assets/models/model.obj");
-	Shader shader("../src/shaders/ship.vs", "../src/shaders/ship.fs", "../src/shaders/geometry.gs");
+	Model model("../assets/models/bowser/bowser.obj");
+	Shader shader("../src/shaders/main.vs", "../src/shaders/main.fs", "../src/shaders/main.gs");
 
 
 	//Tell OpenGL first the position coordinates for lower left point of the viewport relative to the window, and then the size of the viewport
@@ -118,13 +118,27 @@ int main() {
 
 	//Enabling depth test
 	glEnable(GL_DEPTH_TEST);
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "OpenGL error: " << error << std::endl;
+	}
 
+	const float modelScale = 0.3f;
+
+	if (model.textures_loaded.size() > 0) {
+		std::cout << "Textures loaded." << std::endl;
+	}
+	else {
+		std::cout << "No textures found." << std::endl;
+	}
 
 	while(!glfwWindowShouldClose(window)) { //Check if window is instructed to close
 		//We redraw screen every frame, thus we clear the screen in beginning of every loop iteration
 
 		//calculating time variables
 		float currentFrame = static_cast<float>(glfwGetTime());
+		float time = (float)glfwGetTime();
+
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
@@ -141,37 +155,27 @@ int main() {
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
 		glm::mat4 view = camera.GetViewMatrix();
 
+	
+
 		
 
 		float viewamount = 0.25f;
 
-		view = glm::rotate(view, viewamount, glm::vec3(1.0f, 0.0f, 0.0f));
-		view = glm::rotate(view, viewamount, glm::vec3(0.0f, 1.0f, 0.0f));
+		//view = glm::rotate(view, viewamount, glm::vec3(1.0f, 0.0f, 0.0f));
+		//view = glm::rotate(view, viewamount, glm::vec3(0.0f, 1.0f, 0.0f));
 
-		float time = (float)glfwGetTime();
+		
+		glm::mat4 modelMatrix = glm::mat4(1.0f);
+		view = glm::translate(view,glm::vec3(0, 0, -10.0f));
+		modelMatrix = glm::scale(modelMatrix, glm::vec3(modelScale));
 
-
+		shader.setMat4("model", modelMatrix);
 		shader.setMat4("projection", projection);
 		shader.setMat4("view", view);
-
-
 
 		// render the loaded model
 		model.Draw(shader);
 
-		//Render Level
-		//selectedLevel->generate();
-		//selectedLevel->draw();
-
-		//Display title screen
-
-		//view controls, highscore and such
-
-		//PLAY
-		// Select level ----> Less go
-		//Epic gaming
-
-		
 		
 		
 		glfwSwapBuffers(window); //Swaps buffers so it can begin writing to one buffer and reading from the other
